@@ -1,6 +1,17 @@
-# Requisito 1
+import requests
+from requests.exceptions import ConnectionError, HTTPError
+from time import sleep
+
+
 def fetch(url):
-    # Iniciando o projeto
+    header = {"user-agent": "Fake user-agent"}
+    sleep(1)
+    try:
+        response = requests.get(url, header, timeout=3)
+        response.raise_for_status()
+    except (ConnectionError, HTTPError, requests.Timeout):
+        return None
+    return response.text
 
 
 # Requisito 2
@@ -21,3 +32,6 @@ def scrape_news(html_content):
 # Requisito 5
 def get_tech_news(amount):
     """Seu código deve vir aqui"""
+
+
+print(fetch("https://app.betrybe.com/"))
