@@ -8,7 +8,7 @@ def fetch(url):
     header = {"user-agent": "Fake user-agent"}
     sleep(1)
     try:
-        response = requests.get(url, header, timeout=3)
+        response = requests.get(url, headers=header, timeout=3)
         response.raise_for_status()
     except (ConnectionError, HTTPError, requests.Timeout):
         return None
@@ -29,11 +29,42 @@ def scrape_next_page_link(html_content):
     return result.css("a.next::attr(href)").get()
 
 
-# Requisito 4
 def scrape_news(html_content):
-    """Seu código deve vir aqui"""
+    result = Selector(text=html_content)
+    data_news = {
+        "url": result.css("link[rel='canonical']::attr(href)").get(),
+        "title": result.css("h1.entry-title::text").get().strip(),
+        "timestamp": result.css(".meta-date::text").get(),
+        "writer": result.css(".author > a::text").get(),
+        "reading_time": int(
+            result.css(".meta-reading-time::text").re_first(r"\d*")
+        ),
+        "summary": result.xpath("string(//p)").get().strip(),
+        "category": result.css(".label::text").get(),
+    }
 
+    return data_news
+
+
+# {
+#   "url": "https://blog.betrybe.com/novidades/noticia-bacana",
+#   "title": "Notícia bacana",
+#   "timestamp": "04/04/2021",
+#   "writer": "Eu",
+#   "reading_time": 4,
+#   "summary": "Algo muito bacana aconteceu",
+#   "category": "Ferramentas",
+# }
 
 # Requisito 5
 def get_tech_news(amount):
     """Seu código deve vir aqui"""
+
+
+print(
+    scrape_news(
+        fetch(
+            "https://blog.betrybe.com/tecnologia/sistema-operacional-windows/"
+        )
+    )
+)
