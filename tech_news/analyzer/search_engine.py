@@ -26,6 +26,12 @@ def search_by_date(date):
         raise ValueError("Data inválida")
 
 
-# Requisito 9
 def search_by_category(category):
-    """Seu código deve vir aqui"""
+    list_of_news = find_news()
+    select_news = [
+        (new["title"], new["url"])
+        for new in list_of_news
+        if category.lower() in new["category"].lower()
+    ]
+
+    return select_news
