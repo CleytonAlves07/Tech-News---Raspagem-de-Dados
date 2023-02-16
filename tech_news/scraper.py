@@ -2,6 +2,7 @@ import requests
 from parsel import Selector
 from requests.exceptions import ConnectionError, HTTPError
 from time import sleep
+from tech_news.database import create_news
 
 
 def fetch(url):
@@ -46,25 +47,20 @@ def scrape_news(html_content):
     return data_news
 
 
-# {
-#   "url": "https://blog.betrybe.com/novidades/noticia-bacana",
-#   "title": "Notícia bacana",
-#   "timestamp": "04/04/2021",
-#   "writer": "Eu",
-#   "reading_time": 4,
-#   "summary": "Algo muito bacana aconteceu",
-#   "category": "Ferramentas",
-# }
-
-# Requisito 5
 def get_tech_news(amount):
-    """Seu código deve vir aqui"""
+    base_url = "https://blog.betrybe.com/"
+    save_news = []
 
+    while amount > 0:
+        update_data = scrape_updates(fetch(base_url))
+        for url in update_data:
+            html_content = fetch(url)
+            data = scrape_news(html_content)
+            save_news.append(data)
+            amount -= 1
+            if amount == 0:
+                break
+        base_url = scrape_next_page_link(fetch(base_url))
 
-print(
-    scrape_news(
-        fetch(
-            "https://blog.betrybe.com/tecnologia/sistema-operacional-windows/"
-        )
-    )
-)
+    create_news(save_news)
+    return save_news
